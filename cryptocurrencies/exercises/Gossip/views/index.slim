@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Gossip
+  body
+    h1= "Welcome to the Gossip Network, User #{@port}"
+    div
+      p="Your favorite book is #{@book_title}"
+    div
+      table
+        th
+          td ID
+          td Favorite Book
+          td Version
+        - @peers && @peers.each do |peer|
+          tr
+            td peer.id
+            td peer.book_title
+            td peer.version

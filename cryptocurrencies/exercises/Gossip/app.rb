@@ -1,20 +1,33 @@
-require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/json'
+require './services/PeersService'
 
-set :port, ENV['PORT']
+module Gossip
+  class Server < Sinatra::Base
+    set :port, ENV['PORT']
 
-begin
-  seeds = ENV['SEED_IDS'].split(',')
-rescue
-  raise "Please provide at least 1 SEED_ID"
-end
+    begin
+      seeds = ENV['SEED_IDS'].split(',')
+    rescue
+      raise "Please provide at least 1 SEED_ID"
+    end
 
-id = ENV['PORT']
+    id = ENV['PORT']
+    peers = { hello: 'world' }
 
-get '/peers' do
+    get '/peers.json' do
+      content_type :json
+      json peers
+    end
 
-end
+    get '/' do
+      @port = id
+      slim :index
+    end
 
-get '/' do
-  @port = id
-  slim :index
+    service = PeersService.new(seeds)
+    service.bootstrap
+
+    run! if __FILE__ == $0
+  end
 end

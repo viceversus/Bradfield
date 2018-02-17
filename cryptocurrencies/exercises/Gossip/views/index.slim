@@ -8,12 +8,12 @@ html
       p="Your favorite book is #{@book_title}"
     div
       table
-        th
-          td ID
-          td Favorite Book
-          td Version
-        - @peers && @peers.each do |peer|
+        tr
+          th ID
+          th Favorite Book
+          th Version
+        - @peers && @peers.each do |id, peer|
           tr
-            td peer.id
-            td peer.book_title
-            td peer.version
+            td= "#{id}"
+            td= "#{peer.book}"
+            td= "#{peer.version}"

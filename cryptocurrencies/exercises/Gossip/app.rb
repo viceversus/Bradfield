@@ -1,6 +1,8 @@
 require 'sinatra/base'
 require 'sinatra/json'
 require './services/PeersService'
+require './models/Peer'
+
 
 module Gossip
   class Server < Sinatra::Base
@@ -13,20 +15,22 @@ module Gossip
     end
 
     id = ENV['PORT']
-    peers = { hello: 'world' }
+    peers_service = PeersService.new(id, seeds)
+    peers_service.bootstrap
 
     get '/peers.json' do
       content_type :json
-      json peers
+      me = peers_service.me
+      json peers_service.peers.merge({ me.id => me })
     end
 
     get '/' do
       @port = id
+      @peers = peers_service.peers
+      @book_title = peers_service.me.book
       slim :index
     end
 
-    service = PeersService.new(seeds)
-    service.bootstrap
 
     run! if __FILE__ == $0
   end

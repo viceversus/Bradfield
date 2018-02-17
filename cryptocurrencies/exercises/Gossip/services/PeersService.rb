@@ -1,14 +1,27 @@
-require_relative 'RequestService'
+require './services/RequestService'
+require './models/Library'
 
 module Gossip
   class PeersService
-    def initialize(ids)
-      @uris = ids.map { |id| construct_uri_from(id) }
+    attr_reader :peers, :me
+
+    def initialize(my_id, seed_ids)
+      @me = Peer.new(my_id, Library.sample, 1)
+      @peers = {}
+      seed_ids.each do |id|
+        @peers[id] = Peer.new(id, '', 0)
+      end
+
     end
 
     def bootstrap
-      @uris.each do |uri|
-        req = RequestService.get(uri + '/peers.json')
+      @peers.each do |id, peer|
+        if req = RequestService.get(construct_uri_from(id) + '/peers.json')
+          peers_hash = JSON.parse(req.body)
+          peers_hash.each do |id, peer|
+            @peers[id] = Peer.from_hash(peer)
+          end
+        end
       end
     end
 

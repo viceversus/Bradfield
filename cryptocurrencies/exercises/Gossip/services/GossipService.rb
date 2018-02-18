@@ -8,17 +8,12 @@ module Gossip
       body = body_params_from(subject, params)
       threads = []
 
-      peers.each do |id, peer|
-        puts '*' * 50
-        puts "Gossiping to peer", peer
-        puts '*' * 50
-        thread = Thread.new do
-          RequestService.post(construct_uri_from(id), body)
-        end
-        threads.push thread
+      uris = peers.map { |id, _| construct_uri_from(id) }
+      thread = Thread.new do
+        RequestService.post_concurrent(uris, body)
       end
-
-      threads.each { |t| t.join }
+      
+      thread.join
     end
 
     private

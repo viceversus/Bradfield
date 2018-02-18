@@ -27,7 +27,7 @@ module Gossip
 
     def update_peer(id, book, version)
       peer = @peers[id]
-      if !peer || (peer.id != me.id && version > peer.version)
+      if !peer || (peer.id != @me.id && version > peer.version)
         @peers[id] = Peer.new(id, book, version)
       end
     end

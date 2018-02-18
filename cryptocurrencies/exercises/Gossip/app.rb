@@ -34,7 +34,7 @@ module Gossip
       @peers = peers_service.peers
       @book_title = peers_service.me.book
       @cache = cache
-      
+
       slim :index
     end
 
@@ -49,8 +49,8 @@ module Gossip
       return status 200 if ttl == 0
 
       params = {
-        'uuid': body['uuid'],
-        'ttl': ttl
+        'uuid' => body['uuid'],
+        'ttl' => ttl
       }
       GossipService.gossip(peers_service.peers[body['id']], peers_service.peers, params)
       status 200

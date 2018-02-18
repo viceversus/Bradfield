@@ -17,3 +17,7 @@ html
             td= "#{id}"
             td= "#{peer.book}"
             td= "#{peer.version}"
+    div
+      ul
+        - @cache.each do |uuid|
+          li= "#{uuid}"

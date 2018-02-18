@@ -12,18 +12,14 @@ module MerkleTree
 
     def self.create_from(data)
       nodes = []
-      puts nodes
+      data.push '' if data.length.odd?
       data.each_slice(2) do |node_pair|
         string_pair = "#{value_from(node_pair[0])}||#{value_from(node_pair[1])}"
         val = Digest::SHA2.hexdigest(string_pair)
-        nodes << Node.new(val, value_from(node_pair[0]), value_from(node_pair[1]))
+        nodes << Node.new(val, node_pair[0], node_pair[1])
       end
 
-      if nodes.length > 1
-        create_from(nodes)
-      else
-        nodes[0]
-      end
+      nodes.length > 1 ? create_from(nodes) : nodes[0]
     end
 
     private

@@ -8,5 +8,10 @@ describe MerkleTree::Node do
       node = MerkleTree::Node.create_from(data)
       expect(node.value).to eq "4a359c93d6b6c9beaa3fe8d8e68935aa5b5081bd2603549af88dee298fbfdd0a"
     end
+
+    it "creates hash when there are odd numbers of words" do
+      data = %w(We hold these truths to be self-evident)
+      expect { MerkleTree::Node.create_from(data) }.to_not raise_error
+    end
   end
 end

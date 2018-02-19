@@ -27,7 +27,7 @@ module ProofOfWork
 
     def qualifies?(challenge, work_factor, token_value)
       matcher = "0" * work_factor
-      @hashing_service.hexdigest(challenge + token_value.to_s)[0...work_factor] == matcher
+      @hashing_service.hexdigest("#{challenge}#{token_value}")[0...work_factor] == matcher
     end
 
     def cached?(token_value)

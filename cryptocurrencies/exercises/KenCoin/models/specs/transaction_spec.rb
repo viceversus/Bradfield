@@ -26,7 +26,17 @@ describe KenCoin::Transaction do
       end
     end
 
-    context 'when signature is verified' do
+    context 'when signature is verified and amount is invalid' do
+      let(:transaction) {
+        KenCoin::Transaction.new(sender.public_key, recipient.public_key, -10, signature)
+      }
+
+      it 'returns false' do
+        expect(transaction.is_valid?).to eq false
+      end
+    end
+
+    context 'when signature is verified and amount is valid' do
       let(:transaction) {
         KenCoin::Transaction.new(sender.public_key, recipient.public_key, 10, signature)
       }

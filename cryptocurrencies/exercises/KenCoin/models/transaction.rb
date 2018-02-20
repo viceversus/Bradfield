@@ -16,7 +16,7 @@ module KenCoin
       pub_key = OpenSSL::PKey::RSA.new(@from)
       message = pub_key.public_decrypt(@signature)
 
-      true
+      amount > 0
     rescue OpenSSL::PKey::RSAError
       false
     end

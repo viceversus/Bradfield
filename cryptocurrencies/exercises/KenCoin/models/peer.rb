@@ -5,6 +5,10 @@ module KenCoin
     attr_reader :port, :public_key
     attr_accessor :private_key
 
+    def self.parse_json(json)
+      Peer.new(json['port'], OpenSSL::PKey::RSA.new(json['public_key']))
+    end
+
     def initialize(port, public_key)
       @port = port
       @public_key = public_key
@@ -21,7 +25,7 @@ module KenCoin
     def to_json(_)
       {
         port: @port,
-        public_key: @public_key
+        public_key: @public_key.export
       }.to_json
     end
   end

@@ -23,7 +23,7 @@ module KenCoin
       if recipient
         BlockchainService.generate_transaction(peers_service.me.private_key, recipient.public_key, (1..5).to_a.sample)
 
-        GossipService.gossip(port, BlockchainService.current_blockchain, peers_service.peers)
+        GossipService.gossip(peers_service.me, BlockchainService.current_blockchain, peers_service.peers)
       end
     end
 
@@ -45,24 +45,23 @@ module KenCoin
     post '/gossip.json' do
       content_type :json
       body = JSON.parse(request.body.read)
+      their_blockchain = BlockchainService.blockchain_from_json(body['blockchain'])
 
-      new_blockchain = BlockchainService.blockchain_from_json(body['blockchain'])
+      return status 200 if cache.include?(body['uuid']) || peers_service.me.port == body['port']
 
-      p new_blockchain
+      cache.push body['uuid']
+      peers_service.update_peer(body['original_sender']['port'], body['original_sender']['public_key'])
+      BlockchainService.fork_choice(their_blockchain)
+      ttl = body['ttl'].to_i - 1
+      return status 200 if ttl == 0
 
-      # return status 200 if cache.include?(body['uuid']) || peers_service.me.id == body['id']
-      #
-      # cache.push body['uuid']
-      # # peers_service.update_peer(body['id'], body['book'], body['version'])
-      # ttl = body['ttl'].to_i - 1
-      # return status 200 if ttl == 0
-      #
-      # params = {
-      #   'uuid' => body['uuid'],
-      #   'ttl' => ttl
-      # }
-      # GossipService.gossip(peers_service.peers[body['id']], peers_service.peers, params)
-      # status 200
+      params = {
+        'uuid' => body['uuid'],
+        'ttl' => ttl
+      }
+
+      GossipService.gossip(Peer.parse_json(body['original_sender']), peers_service.peers, params)
+      status 200
     end
 
     run! if __FILE__ == $0

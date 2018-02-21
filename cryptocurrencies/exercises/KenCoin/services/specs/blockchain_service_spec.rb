@@ -14,12 +14,12 @@ describe KenCoin::BlockchainService do
     allow(their_blockchain).to receive(:blocks).and_return(their_blocks)
   end
 
-  describe '#choose_blockchain' do
+  describe '#fork_choice' do
     context 'when our blockchain is longer' do
       let(:their_blocks) { [block, block, block] }
 
       it 'chooses our blockchain' do
-        subject.choose_blockchain(our_blockchain, their_blockchain)
+        subject.fork_choice(their_blockchain)
         expect(subject.current_blockchain).to eq our_blockchain
       end
     end
@@ -28,7 +28,7 @@ describe KenCoin::BlockchainService do
       let(:their_blocks) { [block, block, block, block] }
 
       it 'chooses our blockchain' do
-        subject.choose_blockchain(our_blockchain, their_blockchain)
+        subject.fork_choice(their_blockchain)
         expect(subject.current_blockchain).to eq our_blockchain
       end
     end
@@ -37,7 +37,7 @@ describe KenCoin::BlockchainService do
       let(:their_blocks) { [block, block, block, block, block] }
 
       it 'chooses our blockchain' do
-        subject.choose_blockchain(our_blockchain, their_blockchain)
+        subject.fork_choice(their_blockchain)
         expect(subject.current_blockchain).to eq their_blockchain
       end
     end

@@ -5,6 +5,15 @@ html
   body
     h1= "Welcome to the Gossip Network, User #{@port}"
     div
+      h1 Current Blockchain
+      ul
+        - @blockchain.blocks.each do |block|
+          div= "From: #{block.content.from}"
+          div= "To: #{block.content.to}"
+          div= "Amount: #{block.content.amount}"
+
+    div
+      h1 Peers
       ul
         - @peers.each do |port, peer|
           div= "#{peer.port}"

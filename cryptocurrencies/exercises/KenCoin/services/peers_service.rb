@@ -1,3 +1,5 @@
+require 'OpenSSL'
+
 require_relative './request_service'
 require_relative '../models/peer'
 
@@ -24,7 +26,7 @@ module KenCoin
     def update_peer(port, public_key)
       peer = @peers[port]
       if !peer || (peer.port != @me.port)
-        @peers[port] = Peer.new(port, public_key)
+        @peers[port] = Peer.new(port, OpenSSL::PKey::RSA.new(public_key))
       end
     end
 

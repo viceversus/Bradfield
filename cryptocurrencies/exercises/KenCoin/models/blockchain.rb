@@ -1,12 +1,22 @@
 require 'Digest'
 
+require_relative './block'
+
 module KenCoin
   class Blockchain
     BLOCK_REWARD = 100
     attr_reader :blocks
 
-    def initialize()
-      @blocks = []
+    def self.json_parse(json)
+      blocks = json.map do |json_block|
+        Block.json_parse(json_block)
+      end
+
+      Blockchain.new(blocks)
+    end
+
+    def initialize(blocks=[])
+      @blocks = blocks
     end
 
     def add_block(transaction)
@@ -18,6 +28,10 @@ module KenCoin
       previous_hash = ''
       previous_hash = ::Digest::SHA2.hexdigest("#{previous_block.previous_hash}#{previous_block.nonce}") if @blocks.length > 1
       @blocks << Block.new(transaction, previous_hash)
+    end
+
+    def to_json(opts={})
+      @blocks.map { |block| block.to_json(opts) }.to_json
     end
 
     private

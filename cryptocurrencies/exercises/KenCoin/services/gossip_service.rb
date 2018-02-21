@@ -1,13 +1,16 @@
-require './request_service'
+require_relative './request_service'
 
 module KenCoin
-  class GossipService
-    def self.gossip(subject, peers, params = {})
+  module GossipService
+    extend self
+
+    def gossip(id, blockchain, peers, params = {})
       params['uuid'] = SecureRandom.uuid unless params.has_key? 'uuid'
       params['ttl'] = 3 unless params.has_key? 'ttl'
-      body = body_params_from(subject, params)
+      body = body_params_from(id, blockchain, params)
 
       uris = peers.map { |id, _| construct_uri_from(id) }
+
       thread = Thread.new do
         RequestService.post_concurrent(uris, body)
       end
@@ -16,15 +19,15 @@ module KenCoin
     end
 
     private
-    def self.construct_uri_from(id)
+    def construct_uri_from(id)
       "http://localhost:#{id}/gossip.json"
     end
 
-    def self.body_params_from(subject, params)
+    def body_params_from(id, blockchain, params)
       {
         uuid: params['uuid'],
-        id: subject.id,
-        blockchain: subject.blockchain,
+        id: id,
+        blockchain: blockchain,
         ttl: params['ttl']
       }
     end

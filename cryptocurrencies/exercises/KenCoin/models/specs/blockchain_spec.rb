@@ -16,8 +16,12 @@ describe KenCoin::Blockchain do
     let(:signature) { sender.private_encrypt("#{sender_pubkey_snippet}||#{recipient_pubkey_snippet}||#{amount}") }
     let(:amount) { 2 }
     let(:transaction) {
-      KenCoin::Transaction.new(sender.public_key, recipient.public_key, amount, signature)
+      KenCoin::Transaction.new(sender.public_key, recipient.public_key, amount)
     }
+
+    before do
+      transaction.sign(sender)
+    end
 
     context 'when there are no blocks' do
       it 'adds a genesis block' do
@@ -38,7 +42,11 @@ describe KenCoin::Blockchain do
       end
 
       context 'and the transaction is greater than block reward' do
-        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 200, signature) }
+        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 200) }
+
+        before do
+          invalid_transaction.sign(sender)
+        end
 
         it 'does not add the transaction but creates the genesis block' do
           subject.add_block invalid_transaction
@@ -55,7 +63,11 @@ describe KenCoin::Blockchain do
       end
 
       context 'and that user has enough coins in their account' do
-        let(:another_valid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 10, signature) }
+        let(:another_valid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 10) }
+
+        before do
+          another_valid_transaction.sign(sender)
+        end
 
         it 'creates a block with previous hash' do
           expect { subject.add_block(another_valid_transaction) }
@@ -64,7 +76,11 @@ describe KenCoin::Blockchain do
       end
 
       context 'and that user does not have enough coins' do
-        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 99, signature) }
+        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 99) }
+
+        before do
+          invalid_transaction.sign(sender)
+        end
 
         it 'does not create a block' do
           expect { subject.add_block(invalid_transaction) }
@@ -73,8 +89,7 @@ describe KenCoin::Blockchain do
       end
 
       context 'and signature is not verified by the sender' do
-        let(:signature) { recipient.private_encrypt("#{sender_pubkey_snippet}||#{recipient_pubkey_snippet}||10") }
-        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 10, signature) }
+        let(:invalid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 10) }
 
         it 'does not create a block' do
           expect { subject.add_block(invalid_transaction) }

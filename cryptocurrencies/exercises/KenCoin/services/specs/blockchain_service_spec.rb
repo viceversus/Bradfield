@@ -1,7 +1,7 @@
-require_relative '../consensus_service.rb'
+require_relative '../blockchain_service.rb'
 
-describe KenCoin::ConsensusService do
-  subject { KenCoin::ConsensusService }
+describe KenCoin::BlockchainService do
+  subject { KenCoin::BlockchainService }
   let(:our_blockchain) { double('blockchain') }
   let(:their_blockchain) { double('blockchain') }
   let(:block) { double('block') }

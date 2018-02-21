@@ -3,17 +3,19 @@ require_relative '../block.rb'
 require_relative '../transaction.rb'
 
 describe KenCoin::Blockchain do
+  subject { KenCoin::Blockchain.new }
+
   before do
     allow(KenCoin::ProofOfWorkService).to receive(:mint).and_return(42)
   end
 
+  describe '#valid?' do
+
+  end
+
   describe '#add_block' do
-    subject { KenCoin::Blockchain.new }
     let(:sender) { OpenSSL::PKey::RSA.new(2048) }
-    let(:sender_pubkey_snippet) { KenCoin::Transaction::RSA_LINE_MATCHER.match(sender.public_key.export)[0] }
     let(:recipient) { OpenSSL::PKey::RSA.new(2048) }
-    let(:recipient_pubkey_snippet) { KenCoin::Transaction::RSA_LINE_MATCHER.match(recipient.public_key.export)[0] }
-    let(:signature) { sender.private_encrypt("#{sender_pubkey_snippet}||#{recipient_pubkey_snippet}||#{amount}") }
     let(:amount) { 2 }
     let(:transaction) {
       KenCoin::Transaction.new(sender.public_key, recipient.public_key, amount)

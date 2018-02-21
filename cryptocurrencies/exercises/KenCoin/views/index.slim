@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title Gossip
+  body
+    h1= "Welcome to the Gossip Network, User #{@port}"
+    div
+      ul
+        - @peers.each do |port, peer|
+          div= "#{peer.port}"
+          div= "#{peer.public_key}"
+    div
+      ul
+        - @cache.each do |uuid|
+          li= "#{uuid}"

@@ -3,6 +3,10 @@ require_relative '../block.rb'
 require_relative '../transaction.rb'
 
 describe KenCoin::Blockchain do
+  before do
+    allow(KenCoin::ProofOfWorkService).to receive(:mint).and_return(42)
+  end
+
   describe '#add_block' do
     subject { KenCoin::Blockchain.new }
     let(:sender) { OpenSSL::PKey::RSA.new(2048) }

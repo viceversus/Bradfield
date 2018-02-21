@@ -1,18 +1,15 @@
 require 'Digest'
 
 module KenCoin
-  class ProofOfWorkService
-    def initialize(hashing_service = ::Digest::SHA2, ttl = 10)
-      @hashing_service = hashing_service
-      @cache = []
-      @ttl = ttl
-    end
+  module ProofOfWorkService
+    extend self
+    TTL = 10
 
     def mint(challenge, work_factor)
       token_value = 0
       loop do
         if verify(challenge, work_factor, token_value)
-          @cache.push Token.new(token_value)
+          cache.push Token.new(token_value)
           break
         end
         token_value += 1
@@ -25,15 +22,20 @@ module KenCoin
       qualifies?(challenge, work_factor, token_value) && !cached?(token_value)
     end
 
+    private
+    def cache
+      @cache ||= []
+    end
+
     def qualifies?(challenge, work_factor, token_value)
       matcher = "0" * work_factor
-      @hashing_service.hexdigest("#{challenge}#{token_value}")[0...work_factor] == matcher
+      ::Digest::SHA2.hexdigest("#{challenge}#{token_value}")[0...work_factor] == matcher
     end
 
     def cached?(token_value)
-      @cache.any? do |token|
+      cache.any? do |token|
         token_in_cache = token.value == token_value
-        cache_time_remains = Time.now.to_i - token.timestamp <= @ttl
+        cache_time_remains = Time.now.to_i - token.timestamp <= TTL
         token_in_cache && cache_time_remains
       end
     end

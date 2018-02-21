@@ -1,10 +1,10 @@
-require_relative '../services/ProofOfWorkService'
+require_relative '../services/proof_of_work_service'
 
 module KenCoin
   class Block
     attr_reader :content, :previous_hash, :nonce, :hash
 
-    def initialize(content, previous_hash, worker=ProofOfWorkService.new)
+    def initialize(content, previous_hash, worker=ProofOfWorkService)
       @content = content
       @previous_hash = previous_hash
       @worker = worker

@@ -1,5 +1,4 @@
 require 'Digest'
-require 'byebug'
 
 module KenCoin
   class Blockchain

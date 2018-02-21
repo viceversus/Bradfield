@@ -22,7 +22,7 @@ module KenCoin
 
     private
     def add_genesis_block(transaction)
-      genesis_block = Transaction.new('', transaction.from, BLOCK_REWARD, '')
+      genesis_block = Transaction.new('', transaction.from, BLOCK_REWARD)
       @blocks << Block.new(genesis_block, '')
     end
 

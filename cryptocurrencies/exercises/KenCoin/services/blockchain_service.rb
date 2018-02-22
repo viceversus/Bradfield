@@ -17,7 +17,8 @@ module KenCoin
     end
 
     def fork_choice(other_blockchain)
-      if @current_blockchain.blocks.length < other_blockchain.blocks.length
+
+      if @current_blockchain.blocks.length < other_blockchain.blocks.length && other_blockchain.valid?
         @current_blockchain = other_blockchain
       end
     end

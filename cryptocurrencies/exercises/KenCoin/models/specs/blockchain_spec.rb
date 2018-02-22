@@ -4,27 +4,51 @@ require_relative '../transaction.rb'
 
 describe KenCoin::Blockchain do
   subject { KenCoin::Blockchain.new }
+  let(:sender) { OpenSSL::PKey::RSA.new(2048) }
+  let(:recipient) { OpenSSL::PKey::RSA.new(2048) }
+  let(:amount) { 2 }
+  let(:transaction) {
+    KenCoin::Transaction.new(sender.public_key, recipient.public_key, amount)
+  }
 
   before do
     allow(KenCoin::ProofOfWorkService).to receive(:mint).and_return(42)
+    transaction.sign(sender)
   end
 
   describe '#valid?' do
+    let(:another_valid_transaction) { KenCoin::Transaction.new(sender.public_key, recipient.public_key, 5) }
 
+    before do
+      another_valid_transaction.sign(sender)
+      subject.add_block another_valid_transaction
+    end
+
+    context 'when all blocks are valid' do
+      it 'returns true' do
+        new_chain = KenCoin::Blockchain.new(subject.blocks)
+        expect(new_chain.valid?).to eq true
+      end
+    end
+
+    context 'when all blocks are not valid' do
+      let(:invalid_block) { KenCoin::Block.new(another_valid_transaction, 'invalid_hash') }
+
+      before do
+        another_valid_transaction.sign(sender)
+      end
+
+      it 'returns false' do
+        invalid_blocks = subject.blocks
+        invalid_blocks.push invalid_block
+        new_chain = KenCoin::Blockchain.new(invalid_blocks)
+
+        expect(new_chain.valid?).to eq false
+      end
+    end
   end
 
   describe '#add_block' do
-    let(:sender) { OpenSSL::PKey::RSA.new(2048) }
-    let(:recipient) { OpenSSL::PKey::RSA.new(2048) }
-    let(:amount) { 2 }
-    let(:transaction) {
-      KenCoin::Transaction.new(sender.public_key, recipient.public_key, amount)
-    }
-
-    before do
-      transaction.sign(sender)
-    end
-
     context 'when there are no blocks' do
       it 'adds a genesis block' do
         subject.add_block transaction

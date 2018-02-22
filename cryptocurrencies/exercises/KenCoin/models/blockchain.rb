@@ -24,10 +24,16 @@ module KenCoin
 
       return unless sufficient_balance?(transaction) && transaction.is_valid?
 
-      previous_block = @blocks[@blocks.length - 1]
+      previous_block = @blocks[-2]
       previous_hash = ''
       previous_hash = ::Digest::SHA2.hexdigest("#{previous_block.previous_hash}#{previous_block.nonce}") if @blocks.length > 1
       @blocks << Block.new(transaction, previous_hash)
+    end
+
+    def valid?
+      @blocks.map.with_index do |block, i|
+        i == 0 || !@blocks[i+1] ? true : validate_block(block, @blocks[i+1])
+      end.all?
     end
 
     def to_json(opts={})
@@ -35,6 +41,10 @@ module KenCoin
     end
 
     private
+    def validate_block(current_block, next_block)
+      ::Digest::SHA2.hexdigest("#{current_block.previous_hash}#{current_block.nonce}") == next_block.previous_hash
+    end
+
     def add_genesis_block(transaction)
       genesis_block = Transaction.new('', transaction.from, BLOCK_REWARD)
       @blocks << Block.new(genesis_block, '')

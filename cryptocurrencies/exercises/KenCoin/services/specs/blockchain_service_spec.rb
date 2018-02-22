@@ -33,12 +33,23 @@ describe KenCoin::BlockchainService do
       end
     end
 
-    context 'when our blockchain is the same shorter' do
+    context 'when our blockchain is shorter and new chain is valid' do
       let(:their_blocks) { [block, block, block, block, block] }
 
       it 'chooses our blockchain' do
+        allow(their_blockchain).to receive(:valid?).and_return(true)
         subject.fork_choice(their_blockchain)
         expect(subject.current_blockchain).to eq their_blockchain
+      end
+    end
+
+    context 'when our blockchain is shorter and new chain is invalid' do
+      let(:their_blocks) { [block, block, block, block, block] }
+
+      it 'chooses our blockchain' do
+        allow(their_blockchain).to receive(:valid?).and_return(false)
+        subject.fork_choice(their_blockchain)
+        expect(subject.current_blockchain).to eq our_blockchain
       end
     end
   end
